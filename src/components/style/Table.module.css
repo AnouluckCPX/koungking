@@ -1,0 +1,24 @@
+.importtable {
+    width: 100%;
+}
+
+.importtable th {
+    border: 1px solid #ddd;
+    font-size: .875rem;
+    color: #1F2426;
+    background: #f1f1f1;
+    font-weight: 600;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    padding-left: .75rem;
+    padding-right: .75rem;
+    text-align: left;
+}
+
+.importtable tr,
+td {
+    font-size: .875rem;
+    color: #1F2426;
+    padding: .2rem .7rem;
+
+}

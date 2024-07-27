@@ -1,16 +1,13 @@
 import { myAPI } from "./api.jsx";
 
-const userToken = JSON.parse(localStorage.getItem('@koungStock'))
-
-
-const qureyDataDisposal = async ({ page, limit }) => {
+export const qureyDataDisposal = async ({ page, limit, token }) => {
     try {
         const response = await myAPI.post('get_disposal', {
             page: page,
             limit: limit
         }, {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token?.token}`
             },
         })
         if (response.status === 200) {
@@ -26,11 +23,11 @@ const qureyDataDisposal = async ({ page, limit }) => {
     }
 }
 
-const postCreateDisposal = async ({ senddata }) => {
+export const postCreateDisposal = async ({ senddata, token }) => {
     try {
         const response = await myAPI.post('create_disposal', senddata, {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token?.token}`
             },
         })
         if (response.status === 200) {
@@ -42,5 +39,3 @@ const postCreateDisposal = async ({ senddata }) => {
         throw new Error('Failed to post API request:', error);
     }
 }
-
-export { qureyDataDisposal, postCreateDisposal }

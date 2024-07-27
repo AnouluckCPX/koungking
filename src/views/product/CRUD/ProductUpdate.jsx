@@ -4,28 +4,29 @@ import classes from '../../../components/style/LayoutStyle.module.css'
 import classesbtn from '../../../components/style/ButtonStyle.module.css'
 import { myAPI } from '../../../middleware/api.jsx';
 import { USER_KEY } from '../../../middleware/userKey.jsx';
-import { useHistory } from 'react-router-dom';
 import { X, ImagePlus } from 'lucide-react';
-import { UploadOutlined } from '@ant-design/icons';
 import { alertSuccess } from '../../../components/notification/Notification.jsx'
 import { loadDataCategory } from '../../../middleware/CategoryAPI.jsx'
 import { putUpdateProduct } from '../../../middleware/ProductAPI.jsx';
 
+const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 
 function ProductUpdate({ dataValue, use, cbuse, result, cbresult }) {
     const [listDataCategory, setListDataCategory] = useState([])
 
     const [dataOld, setDataOld] = useState(dataValue)
-    const { pro_id, pro_barcode, pro_name, pro_price, pro_unit, pro_img, pro_status, pro_type, cate_id, price_sell } = dataOld
+    const { pro_id, pro_barcode, pro_name, pro_price, pro_unit, pro_img, pro_status, pro_type, cate_id, pro_price_sell, per_unit } = dataOld
 
     useEffect(() => {
         setDataOld(dataValue)
     }, [dataValue]);
 
+    // console.log(dataOld);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const { data } = await loadDataCategory();
+                const { data } = await loadDataCategory({ token: userToken });
                 let update = data?.data?.map((x) => ({
                     value: x.cate_id,
                     label: x.cate_name
@@ -93,12 +94,13 @@ function ProductUpdate({ dataValue, use, cbuse, result, cbresult }) {
             barcode: pro_barcode,
             status: proStatus,
             pro_type: proType,
-            price_sell: price_sell
+            price_sell: pro_price_sell,
+            per_unit: per_unit
         }
 
         try {
-            const { data } = await putUpdateProduct({ senddata: sendData })
-            console.log(data)
+            const { data } = await putUpdateProduct({ senddata: sendData, token: userToken });
+            console.log(data);
             setTimeout(() => {
                 alertSuccess({ title: 'ແກ້ໄຂສຳເລັດ', label: 'ແກ້ໄຂຂໍ້ມູນສິນຄ້າໃໝ່ໃນລະບົບສຳເລັດແລ້ວ.' })
                 cbuse(!use)
@@ -138,6 +140,15 @@ function ProductUpdate({ dataValue, use, cbuse, result, cbresult }) {
                     </div>
                     <div>
                         <p className="text-md mb-1.5 font-medium">
+                            ໜ່ວຍ
+                        </p>
+                        <InputNumber
+                            value={per_unit}
+                            min={1} defaultValue={0} autoComplete={false} size='middle' className='w-full'
+                            onChange={(e) => setDataOld({ ...dataOld, per_unit: e })} />
+                    </div>
+                    <div>
+                        <p className="text-md mb-1.5 font-medium">
                             ຮູບສິນຄ້າ
                         </p>
                         <div className='border border-solid rounded-md px-3 py-3'>
@@ -159,13 +170,13 @@ function ProductUpdate({ dataValue, use, cbuse, result, cbresult }) {
                             ລາຄາຂາຍ
                         </p>
                         <InputNumber
-                            value={price_sell}
+                            value={pro_price_sell}
                             min={1} defaultValue={0} autoComplete={false} size='middle' className='w-full'
-                            onChange={(e) => setDataOld({ ...dataOld, price_sell: e })} />
+                            onChange={(e) => setDataOld({ ...dataOld, pro_price_sell: e })} />
                     </div>
                     <div>
                         <p className="text-md mb-1.5 font-medium">
-                            ລາຄາຂາຍ
+                            ລາຄາສາງ
                         </p>
                         <InputNumber
                             value={pro_price}

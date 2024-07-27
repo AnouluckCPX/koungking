@@ -10,11 +10,14 @@ import moment from 'moment/moment';
 import PackingPreOrder from './CRUD/component/PackingPreOrder.jsx';
 import { MyToken } from '../../middleware/LoginAPI.jsx';
 import CarPreOrderHome from './CarPreOrderHome.jsx';
+import { USER_KEY } from '../../middleware/userKey.jsx';
+import Cookies from 'js-cookie';
+import SaleHome from './CRUD/sale/SaleHome.jsx';
 
-
+const userToken = Cookies.get('koungStock')
 
 function PreOrderHome() {
-    let token = MyToken()
+    // let token = MyToken()
     const { Search } = Input
     const history = useHistory()
     const location = useLocation()
@@ -22,7 +25,6 @@ function PreOrderHome() {
     const [top, setTop] = useState('topRight')
     const [loading, setLoading] = useState(false)
 
-    const [pageSize, setPageSize] = useState(10)
     const [totalItems, setTotalItems] = useState(1)
 
     const [listData, setListData] = useState([])
@@ -32,10 +34,16 @@ function PreOrderHome() {
     const [isOpen, setIsOpen] = useState({ packing: false })
     const [checkIsOpen, setCheckIsOpen] = useState({ package: false })
 
-    const fetchData = async ({ status, page }) => {
+    const fetchData = async ({ status, page, pageSize, token }) => {
+        let filteies
+        if (status === 'all') {
+            filteies = ''
+        } else {
+            filteies = status
+        }
         setLoading(true);
         try {
-            const { data, total } = await loadDataPreOrder({ filter: status, page: page, limit: pageSize })
+            const { data, total } = await loadDataPreOrder({ filter: filteies, page: page, limit: pageSize, token })
             setTimeout(() => {
                 setListData(data)
                 setTotalItems(total)
@@ -47,16 +55,12 @@ function PreOrderHome() {
     };
 
     useEffect(() => {
-        let _filter
-        if (selectDefult === 'all') {
-            _filter = ''
-        } else {
-            _filter = selectDefult
-        }
-        fetchData({ status: _filter, page: 1 })
-    }, [selectDefult])
+        fetchData({ status: selectDefult, page: 1, pageSize: 10, token: userToken })
+    }, [selectDefult, userToken])
 
     const handleSelectFilter = (e) => setSelectDefult(e)
+
+
 
     const columns = [
         {
@@ -75,17 +79,11 @@ function PreOrderHome() {
             render: (text) => <p className='text-xs'>{text}</p>,
             width: 100,
         },
+
         {
-            title: 'ລວມລາຍການ',
-            dataIndex: 'total_unit',
-            key: 'total_unit',
-            render: (text) => <p>{text}</p>,
-            width: 90,
-        },
-        {
-            title: 'ລວມສ່ວນຫລຸດ',
-            dataIndex: 'o_discount',
-            key: 'o_discount',
+            title: 'ລູກຄ້າ',
+            dataIndex: 'cus_name',
+            key: 'cus_name',
             render: (text) => <p>{text}</p>,
             width: 90,
         },
@@ -93,12 +91,12 @@ function PreOrderHome() {
             title: 'ລວມມູນຄ່າ',
             dataIndex: 'total_price',
             key: 'total_price',
-            render: (text) => <NumericFormat value={text} allowLeadingZeros thousandSeparator="," suffix={' ກີບ'} />,
+            render: (text) => <p>{text?.toLocaleString()}</p>,
             width: 100,
         },
         {
             align: 'center',
-            title: 'ສະຖານະ',
+            title: 'ການຈັດສົ່ງ',
             dataIndex: 'o_status',
             key: 'o_status',
             render: (text) => (
@@ -111,6 +109,13 @@ function PreOrderHome() {
                 </>
             ),
             width: 100,
+        },
+        {
+            title: 'ການຊຳລະ',
+            dataIndex: 'o_payment_status',
+            key: 'o_payment_status',
+            render: (text) => <p>{text === 'paid' ? 'ຈ່າຍແລ້ວ' : '-'}</p>,
+            width: 90,
         },
         {
             align: 'center',
@@ -148,14 +153,19 @@ function PreOrderHome() {
         <>
 
             <div className=''>
-                <h3 className={`${classes.header}`}>ການເບີກ ແລະ ຈັດສົ່ງສິນຄ້າ</h3>
+                {/* <h3 className={`${classes.header}`}>ການເບີກ ແລະ ຈັດສົ່ງສິນຄ້າ</h3> */}
                 <Tabs
                     className='mx-4 mt-4'
                     type="card"
                     items={[
                         {
                             key: '1',
-                            label: 'ເບີກສິນຄ້າ',
+                            label: 'ຂາຍປົກກະຕິ',
+                            children: <SaleHome />,
+                        },
+                        {
+                            key: '2',
+                            label: 'ລາຍການເບີກສິນຄ້າ',
                             children: <>
                                 <div className={`${classes.contentnopad} mb-5 flex items-center justify-between`}>
                                     <div className='flex p-3'>
@@ -193,11 +203,11 @@ function PreOrderHome() {
                                         columns={columns}
                                         pagination={{
                                             position: [top],
-                                            pageSize: pageSize,
+                                            // pageSize: pageSize,
                                             total: totalItems,
                                             showSizeChanger: true,
-                                            onChange: (page) => {
-                                                fetchData({ status: selectDefult, page: page })
+                                            onChange: (page, pageSize) => {
+                                                fetchData({ status: selectDefult, page: page, pageSize: pageSize })
                                             }
                                         }}
                                         dataSource={listData}
@@ -210,8 +220,8 @@ function PreOrderHome() {
                             </>,
                         },
                         {
-                            key: '2',
-                            label: 'ຈັດສົ່ງສິນຄ້າ',
+                            key: '3',
+                            label: 'ການຈັດສົ່ງສິນຄ້າ',
                             children: <CarPreOrderHome />,
                         },
                     ]}

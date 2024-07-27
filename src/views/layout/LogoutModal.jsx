@@ -2,7 +2,7 @@ import { Modal } from 'antd';
 import React from 'react'
 import { useHistory } from 'react-router-dom';
 import { USER_KEY } from '../../middleware/userKey.jsx';
-
+import Cookies from 'js-cookie';
 
 function LogoutModal({ isOpen, isCancel }) {
     const history = useHistory();
@@ -11,6 +11,7 @@ function LogoutModal({ isOpen, isCancel }) {
     const handleOk = () => {
         localStorage.removeItem(USER_KEY)
         history.push('/')
+        Cookies.remove('koungStock')
     };
 
     return (

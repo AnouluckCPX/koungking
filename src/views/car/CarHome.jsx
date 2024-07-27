@@ -7,7 +7,9 @@ import { CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icon
 import CarCreate from './CRUD/CarCreate.jsx';
 import { queryDataCar } from '../../middleware/CarAPI.jsx'
 import CarUpdate from './CRUD/CarUpdate.jsx';
+import { USER_KEY } from '../../middleware/userKey.jsx';
 
+const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 function CarHome() {
     const [openStatus, setOpenStatus] = useState({ create: false, update: false, delete: false });
     const [checkResult, setCheckResult] = useState({ create: false, update: false, delete: false });
@@ -27,7 +29,7 @@ function CarHome() {
         const fetchData = async () => {
             setLoading(true)
             try {
-                const { data } = await queryDataCar()
+                const { data } = await queryDataCar({ token: userToken })
                 setTimeout(() => {
                     // console.log(data);
                     setListData(data?.data)
@@ -43,7 +45,7 @@ function CarHome() {
         } else {
             fetchData()
         }
-    }, [checkResult.create, checkResult.update, checkResult.delete])
+    }, [checkResult.create, checkResult.update, checkResult.delete, userToken])
 
     const columns = [
         {

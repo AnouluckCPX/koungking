@@ -1,69 +1,58 @@
-import { MyToken } from "./LoginAPI.jsx";
 import { myAPI } from "./api.jsx";
 
-const userToken = JSON.parse(localStorage.getItem('@koungStock'))
+const mm = JSON.parse(localStorage.getItem('@koungStock'))
 
-
-const loadDataProduct = async ({ page, limit, token }) => {
+export const loadDataProduct = async ({ page, limit, token }) => {
     try {
-        const response = await myAPI.post('product', {
-            page: page,
-            limit: limit
-        }, {
+        const response = await myAPI.post('product', { page, limit }, { headers: { 'Authorization': `Bearer ${token?.token}` } });
+        return response.data;
+    } catch (error) {
+        throw new Error('Failed to load products:', error);
+    }
+};
+
+export const postCreateProduct = async ({ senddata, token }) => {
+    try {
+        const response = await myAPI.post('add_product', senddata, {
+            headers: {
+                'Authorization': `Bearer ${token?.token}`
+            },
+        })
+        if (response.status === 200) return { data: response?.data }
+    } catch (error) {
+        throw new Error('Failed to post API request:', error);
+    }
+}
+
+const putUpdateProduct = async ({ senddata, token }) => {
+    // console.log(senddata);
+    // console.log(token?.token);
+    try {
+        const response = await myAPI.put('product', senddata, {
             headers: {
                 'Authorization': `Bearer ${token?.token}`
             },
         })
         if (response.status === 200) {
-            if (response.data.resultCode === 200) {
-                return {
-                    data: response?.data?.data,
-                    total: response?.data?.total,
-                }
-            }
-        }
+            return { data: response?.data }
+        } else { return { data: response?.data } }
     } catch (error) {
         throw new Error('Failed to post API request:', error);
     }
 }
 
-const postCreateProduct = async ({ senddata }) => {
-    try {
-        const response = await myAPI.post('add_product', senddata, {
-            headers: {
-                'Authorization': `Bearer ${userToken?.token}`
-            },
-        })
-        if (response.status === 200) return { data: response?.data }
-    } catch (error) {
-        throw new Error('Failed to post API request:', error);
-    }
-}
-
-const putUpdateProduct = async ({ senddata }) => {
-    try {
-        const response = await myAPI.put('product', senddata, {
-            headers: {
-                'Authorization': `Bearer ${userToken?.token}`
-            },
-        })
-        if (response.status === 200) return { data: response?.data }
-    } catch (error) {
-        throw new Error('Failed to post API request:', error);
-    }
-}
-
-const postDeleteProduct = async ({ senddata }) => {
+export const postDeleteProduct = async ({ senddata, token }) => {
     try {
         const response = await myAPI.post('dl_product', senddata, {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token?.token}`
             },
         })
-        if (response.status === 200) return { data: response?.data }
+        if (response.status === 200) { return { data: response } }
+        else { return { data: response } }
     } catch (error) {
         throw new Error('Failed to post API request:', error);
     }
 }
 
-export { loadDataProduct, postCreateProduct, putUpdateProduct, postDeleteProduct };
+export { putUpdateProduct }

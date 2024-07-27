@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react"
 import { myAPI } from '../../middleware/api.jsx';
 import { USER_KEY } from '../../middleware/userKey.jsx';
 import { postLogin } from '../../middleware/LoginAPI.jsx';
+import Cookies from 'js-cookie';
 
 function SubmitForm() {
     let history = useHistory()
@@ -45,6 +46,7 @@ function SubmitForm() {
 
                     setTimeout(() => {
                         localStorage.setItem(USER_KEY, JSON.stringify(res?.data))
+                        Cookies.set('koungStock', res?.data?.token, { expires: 7 })
                         history.push('/home/dashborad')
                         setLoading(false)
                     }, 200)

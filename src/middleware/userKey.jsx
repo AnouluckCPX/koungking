@@ -1,2 +1,2 @@
-export const USER_KEY = "@koungStock";
+export const USER_KEY = "koungStock";
 

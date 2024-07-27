@@ -13,7 +13,7 @@ function CategoryUpdate({ dataValue, use, cbuse, result, cbresult }) {
     const userToken = JSON.parse(localStorage.getItem(USER_KEY))
     // console.log(dataValue)
     const [dataOld, setDataOld] = useState(dataValue)
-    const { cate_id, cate_name, seq, status } = dataOld
+    const { cate_id, cate_name, discount_vip, status } = dataOld
 
     useEffect(() => {
         setDataOld(dataValue)
@@ -32,6 +32,7 @@ function CategoryUpdate({ dataValue, use, cbuse, result, cbresult }) {
         let sendData = {
             id: cate_id,
             name: cate_name,
+            discount_vip: discount_vip,
             status: cateStatus
         }
         // console.log(sendData);
@@ -67,6 +68,14 @@ function CategoryUpdate({ dataValue, use, cbuse, result, cbresult }) {
                         <Input size='middle'
                             value={cate_name}
                             onChange={(e) => setDataOld({ ...dataOld, cate_name: e.target.value })} />
+                    </div>
+                    <div>
+                        <p className="text-md mb-1.5 font-medium">
+                            ສ່ວນຫລຸດພິເສດ
+                        </p>
+                        <Input size='middle'
+                            value={discount_vip}
+                            onChange={(e) => setDataOld({ ...dataOld, discount_vip: e.target.value })} />
                     </div>
                     <div>
                         <p className="text-md mb-1.5 font-medium">

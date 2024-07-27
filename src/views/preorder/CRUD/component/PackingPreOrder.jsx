@@ -6,7 +6,9 @@ import { postPackingPreOrder } from '../../../../middleware/PreOrderAPI.jsx'
 import { queryDataCar } from '../../../../middleware/CarAPI.jsx'
 import { NumericFormat } from 'react-number-format';
 import { alertSuccess } from '../../../../components/notification/Notification.jsx'
+import { USER_KEY } from '../../../../middleware/userKey.jsx'
 
+const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 function PackingPreOrder({ use, cbuse, result, cbresult, getdata }) {
 
     const [oldData, setOldData] = useState(getdata);
@@ -21,7 +23,7 @@ function PackingPreOrder({ use, cbuse, result, cbresult, getdata }) {
     useEffect(() => {
         const fetchDataCar = async () => {
             try {
-                const { data } = await queryDataCar();
+                const { data } = await queryDataCar({ token: userToken });
                 let update = data?.data?.map((x) => ({
                     value: x.c_id,
                     label: x.c_regis,
@@ -32,7 +34,7 @@ function PackingPreOrder({ use, cbuse, result, cbresult, getdata }) {
             }
         }
         fetchDataCar()
-    }, [])
+    }, [userToken])
 
     const columns = [
         {
@@ -61,7 +63,7 @@ function PackingPreOrder({ use, cbuse, result, cbresult, getdata }) {
             c_id: selectCar
         }
         try {
-            const { data } = await postPackingPreOrder({ senddata: sendData })
+            const { data } = await postPackingPreOrder({ senddata: sendData, token: userToken })
             // console.log(data)
             if (data?.status === 200) {
                 setTimeout(() => {

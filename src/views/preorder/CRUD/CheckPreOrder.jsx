@@ -4,14 +4,18 @@ import classes from '../../../components/style/LayoutStyle.module.css'
 import classesbtn from '../../../components/style/ButtonStyle.module.css'
 import { useHistory, useLocation } from 'react-router-dom'
 import { loadDataPreOrderByID, postCheckOrderSuccess, postCloseOrder } from '../../../middleware/PreOrderAPI.jsx';
-import { Loader, ReceiptText, Truck, CircleUserRound } from 'lucide-react';
+import { Loader, ReceiptText, Truck, CircleUserRound, Printer } from 'lucide-react';
 import { NumericFormat } from 'react-number-format';
 import moment from 'moment/moment';
 import PackingPreOrder from './component/PackingPreOrder.jsx';
 import CancelOrderDialog from './component/CancelOrderDialog.jsx';
 import FooterRemark from './component/FooterRemark.jsx';
+import { USER_KEY } from '../../../middleware/userKey.jsx';
+
+const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 
 function CheckPreOrder() {
+    const history = useHistory()
     const [isOpen, setIsOpen] = useState({ packing: false, cancelorder: false })
     const [checkIsOpen, setCheckIsOpen] = useState({ package: false, cancelorder: false })
 
@@ -35,7 +39,7 @@ function CheckPreOrder() {
         const fetchDataProduct = async () => {
             setLoading(true)
             try {
-                const { data } = await loadDataPreOrderByID({ id: dataOld?.o_id })
+                const { data } = await loadDataPreOrderByID({ id: dataOld?.o_id, token: userToken })
                 // console.log(data);
                 let update = data?.data?.map((x) => {
                     return {
@@ -70,7 +74,7 @@ function CheckPreOrder() {
         } else {
             fetchDataProduct()
         }
-    }, [checkIsOpen.cancelorder, checkIsOpen.package])
+    }, [checkIsOpen.cancelorder, checkIsOpen.package, userToken])
 
 
 
@@ -161,7 +165,7 @@ function CheckPreOrder() {
             order_detail: selectedRowKeys
         }
         try {
-            const { data } = await postCheckOrderSuccess({ senddata: sendData })
+            const { data } = await postCheckOrderSuccess({ senddata: sendData, token: userToken })
             // console.log(data)
             if (data?.status === 200) {
                 setTimeout(() => {
@@ -180,7 +184,7 @@ function CheckPreOrder() {
             o_id: o_id,
         }
         try {
-            const { data } = await postCloseOrder({ senddata: sendData })
+            const { data } = await postCloseOrder({ senddata: sendData, token: userToken })
             if (data?.status === 200) {
                 setTimeout(() => {
                     window.location.reload()
@@ -205,22 +209,28 @@ function CheckPreOrder() {
             <div className={`${classes.content}`}>
                 <div className='flex justify-between items-center'>
                     <h3 className={`text-lg font-bold`}>ລາຍລະອຽດໃບບິນເລກທີ {o_id}</h3>
-                    {
-                        o_status === 'packing'
-                            ? <div>
-                                <Button className={`${classesbtn.close} w-fit mr-4`} onClick={() => setIsOpen({ cancelorder: true })}>
-                                    ຍົກເລີກບິນ
-                                </Button>
-                                <Button className={`${classesbtn.base} w-[6rem]`} onClick={handleCloseOrder}>
-                                    ປິດບິນ
-                                </Button>
-                            </div>
-                            : o_status === 'success' || o_status === 'canceled'
-                                ? <p className='text-red-500'>*ໃບບິນຖືກກວດສອບສຳເລັດ</p>
-                                : <Button className={`${classesbtn.base} w-fit`} onClick={() => setIsOpen({ packing: true })}>
-                                    ຈັດສົ່ງສິນຄ້າ
-                                </Button>
-                    }
+                    <div className='flex'>
+                        <Button icon={<Printer width={16} />} className={`${classesbtn.transaction} w-fit mr-4 flex items-center`}
+                            onClick={() => history.push({ pathname: '/home/preorder/receipt', state: { data: dataOld } })}>
+                            ອອກໃບບິນ
+                        </Button>
+                        {
+                            o_status === 'packing'
+                                ? <div>
+                                    <Button className={`${classesbtn.close} w-fit mr-4`} onClick={() => setIsOpen({ cancelorder: true })}>
+                                        ຍົກເລີກບິນ
+                                    </Button>
+                                    <Button className={`${classesbtn.base} w-[6rem]`} onClick={handleCloseOrder}>
+                                        ສຳເລັດ
+                                    </Button>
+                                </div>
+                                : o_status === 'success' || o_status === 'canceled'
+                                    ? <p className='text-red-500'>*ໃບບິນຖືກກວດສອບສຳເລັດ</p>
+                                    : <Button className={`${classesbtn.base} w-fit`} onClick={() => setIsOpen({ packing: true })}>
+                                        ຈັດສົ່ງສິນຄ້າ
+                                    </Button>
+                        }
+                    </div>
                 </div>
                 <hr className='my-1.5' />
                 <div className='grid grid-cols-3 gap-5'>

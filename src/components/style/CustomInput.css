@@ -1,0 +1,17 @@
+.bill .ant-input-number-input-wrap {
+    padding-right: 2px;
+    font-size: .625rem;
+}
+
+.bill .ant-input-number-input-wrap>input.ant-input-number-input {
+    text-align: right;
+}
+
+.bill2 .ant-input-number-input-wrap {
+    padding-right: 2px;
+    font-size: .625rem;
+}
+
+.bill2 .ant-input-number-input-wrap>input.ant-input-number-input {
+    text-align: left;
+}

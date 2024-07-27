@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import iccomplete from '../../assets/icon/tick-mark.svg'
 import '../style/ButtonStyle.css'
 
-function ModalComplete({ open, close, label, header, labelok, labelnew, labelcheck, labelcancel }) {
+function ModalComplete({ open, close, label, header, labelnew, labelcancel, preorderID }) {
     let history = useHistory()
 
     return (
@@ -15,18 +15,21 @@ function ModalComplete({ open, close, label, header, labelok, labelnew, labelche
             open={open}
             okButtonProps={{ className: 'base w-fit' }}
             cancelButtonProps={{ className: 'transaction w-fit' }}
-            onOk={() => history.push(`/home/preorder/receipt`)}
+            onOk={() => history.push({ pathname: '/home/preorder/receipt', state: { data: { o_id: preorderID } } })}
             onCancel={() => {
                 close(!open)
                 window.location.reload()
             }}
-            okText={<p >{labelok}</p>}
-            cancelText={<p >{labelcancel}</p>}
+            okText={<p>ພິມໃບບິນ</p>}
+            cancelText={<p>ສ້າງລາຍການໃໝ່</p>}
             footer={(_, { OkBtn, CancelBtn }) => (
                 <div className='flex justify-center'>
-                    <Button className=' mr-2' onClick={() => history.push('/home/preorder')}>{labelnew}</Button>
+                    <Button className=' mr-2' onClick={() => history.push('/home/preorder')}>ກັບຄືນ</Button>
                     <CancelBtn />
-                    <Button className='check mx-2' onClick={() => history.push('/home/preorder/check')}>{labelcheck}</Button>
+                    <Button className='check mx-2'
+                        onClick={() => history.push({ pathname: '/home/preorder/check', state: { data: { o_id: preorderID } } })}>
+                        ກວດສິນຄ້າ
+                    </Button>
                     <OkBtn />
                 </div>
             )}

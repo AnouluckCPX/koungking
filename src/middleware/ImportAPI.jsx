@@ -1,17 +1,13 @@
-import { MyToken } from "./LoginAPI.jsx";
 import { myAPI } from "./api.jsx";
 
-// const userToken = MyToken()
-const userToken = JSON.parse(localStorage.getItem('@koungStock'))
-
-const queryDataImport = async (page, pageSize) => {
+export const queryDataImport = async ({ page, pageSize, token }) => {
     try {
         const response = await myAPI.post('get_import', {
             page: page,
             limit: pageSize
         }, {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token?.token}`
             },
         });
 
@@ -26,11 +22,11 @@ const queryDataImport = async (page, pageSize) => {
     }
 }
 
-const postCreateImport = async ({ senddata }) => {
+export const postCreateImport = async ({ senddata, token }) => {
     try {
         const response = await myAPI.post('create_import', senddata, {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token?.token}`
             },
         })
         if (response.status === 200) return { data: response };
@@ -40,11 +36,11 @@ const postCreateImport = async ({ senddata }) => {
     }
 };
 
-const postQueryImportById = async (id) => {
+export const postQueryImportById = async ({ id, token }) => {
     try {
         const response = await myAPI.post('select_one_import', { im_id: id }, {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token?.token}`
             },
         })
         // console.log(response?.data);
@@ -54,7 +50,3 @@ const postQueryImportById = async (id) => {
         throw new Error('Failed to post API request:', error);
     }
 };
-
-
-
-export { queryDataImport, postCreateImport, postQueryImportById };

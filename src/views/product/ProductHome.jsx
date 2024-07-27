@@ -1,15 +1,19 @@
 import React, { useEffect, useState, Fragment } from 'react';
-import { Button, Input, Space, Table, Tag } from 'antd';
+import { Button, Input, Pagination, Space, Table, Tag } from 'antd';
 import classes from '../../components/style/LayoutStyle.module.css'
 import classesbtn from '../../components/style/ButtonStyle.module.css'
 import { loadDataProduct } from '../../middleware/ProductAPI.jsx'
-import { FilePen, Trash, Loader } from 'lucide-react';
+import { FilePen, Trash, Loader, RefreshCcw, ImageOff } from 'lucide-react';
 import { CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import ProductCreate from './CRUD/ProductCreate.jsx';
 import ProductUpdate from './CRUD/ProductUpdate.jsx';
 import ProductDelete from './CRUD/ProductDelete.jsx';
+import { USER_KEY } from '../../middleware/userKey.jsx';
+
+const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 
 function ProductHome() {
+
     const [openStatus, setOpenStatus] = useState({ create: false, update: false, delete: false });
     const [checkResult, setCheckResult] = useState({ create: false, update: false, delete: false });
 
@@ -18,17 +22,16 @@ function ProductHome() {
     const top = 'topRight'
     const [loading, setLoading] = useState(false)
 
-    const pageSize = 10
     const [totalItems, setTotalItems] = useState(1)
-
     const [listData, setListData] = useState([])
     const [findDataUpdate, setFindDataUpdate] = useState([])
+    const [pageSize, setPageSize] = useState(10);
+    const [page, setPage] = useState(1);
 
-    const fetchData = async ({ page }) => {
+    const fetchData = async ({ page, pageSize }) => {
         setLoading(true)
         try {
-            const { data, total } = await loadDataProduct({ page: page, limit: pageSize })
-            // console.log(data);
+            const { data, total } = await loadDataProduct({ page: page, limit: pageSize, token: userToken })
             setListData(data);
             setTotalItems(total);
             setLoading(false);
@@ -40,11 +43,11 @@ function ProductHome() {
 
     useEffect(() => {
         if (checkResult.create || checkResult.update || checkResult.delete) {
-            fetchData({ page: 1 })
+            fetchData({ page: page, pageSize });
         } else {
-            fetchData({ page: 1 })
+            fetchData({ page: page, pageSize });
         }
-    }, [checkResult.create, checkResult.update, checkResult.delete])
+    }, [checkResult.create, checkResult.update, checkResult.delete, userToken, pageSize])
 
 
     const columns = [
@@ -62,10 +65,15 @@ function ProductHome() {
             dataIndex: ['pro_name', 'pro_img'],
             key: 'pro_name',
             render: (_, row) => (
-                <div className='flex'>
-                    <img src={row['pro_img']} className='w-10 pr-1' />
+                <button className='flex' onClick={() => {
+                    setFindDataUpdate(row)
+                    setOpenStatus({ update: true })
+                }}>
+                    {row['pro_img'] === '' || row['pro_img'] === null
+                        ? <div className='w-10 flex justify-center'><ImageOff width={22} className='pr-1' color='#777' /></div>
+                        : <img src={row['pro_img']} className='w-10 pr-1' />}
                     <p>{row['pro_name']}</p>
-                </div>
+                </button>
             ),
             width: 350,
         },
@@ -75,6 +83,13 @@ function ProductHome() {
             key: 'pro_price_sell',
             render: (text) => <p>{text}</p>,
             width: 100,
+        },
+        {
+            title: 'ໜ່ວຍ',
+            dataIndex: 'pro_per_unit',
+            key: 'pro_per_unit',
+            render: (text) => <p>{text}</p>,
+            width: 80,
         },
         {
             title: 'ລາຄານຳເຂົ້າ',
@@ -161,19 +176,19 @@ function ProductHome() {
                             onClick={() => setOpenStatus({ create: true })}>ເພີ່ມຂໍ້ມູນໃໝ່</Button>}
                     </div>
                     <div className={`${classes.content}`}>
+                        <div className='flex justify-between items-end mb-5'>
+                            <Button className='shadow-none border-[#1677ff]' onClick={() => fetchData({ page: page, pageSize })}><RefreshCcw width={16} color='#1677ff' /></Button>
+                            <Pagination total={totalItems} onChange={(page, pageSize) => {
+                                setPageSize(pageSize)
+                                setPage(page)
+                                fetchData({ page: page, pageSize })
+                            }} />
+                        </div>
                         <Table
                             loading={loading ? tableLoading : false}
                             className='custablepro'
                             columns={columns}
-                            pagination={{
-                                position: [top],
-                                pageSize: pageSize,
-                                total: totalItems,
-                                showSizeChanger: true,
-                                onChange: (page) => {
-                                    fetchData({ page: page })
-                                }
-                            }}
+                            pagination={false}
                             dataSource={listData}
                             scroll={{
                                 x: 500,

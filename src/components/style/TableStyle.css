@@ -19,3 +19,19 @@
     padding: .5rem .3125rem !important;
     font-size: .875rem !important;
 }
+
+.tablebill {
+    width: 100%;
+}
+
+.tablebill th {
+    border: 1px solid #ddd;
+    font-size: .75rem;
+    color: #1F2426;
+    font-weight: 600;
+    padding-top: .2rem;
+    padding-bottom: .2rem;
+    padding-left: .2rem;
+    padding-right: .2rem;
+    text-align: left;
+}

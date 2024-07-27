@@ -1,0 +1,11 @@
+.button-pay {
+    background-color: #3b82f6 !important;
+    color: white !important;
+    border: none !important;
+}
+
+.button-pay:hover {
+    background-color: #092767 !important;
+    color: white !important;
+    border: none !important;
+}

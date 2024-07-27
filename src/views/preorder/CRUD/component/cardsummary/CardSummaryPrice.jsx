@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { InputNumber } from 'antd';
-import classes from '../../../../components/style/LayoutStyle.module.css'
+import classes from '../../../../../components/style/LayoutStyle.module.css'
 import classesInput from './CardSummaryPrice.module.css'
 
 

@@ -1,11 +1,8 @@
-import React, { useEffect, useState, Fragment } from 'react';
-import { Button, Input, InputNumber, Select, Space, Table, Tabs, Tag, Typography } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Button, Input, InputNumber, Space, Table, Tabs, Tag } from 'antd';
 import classes from '../../components/style/LayoutStyle.module.css'
 import classesbtn from '../../components/style/ButtonStyle.module.css'
-import { loadDataPreOrder } from '../../middleware/PreOrderAPI.jsx'
-import { Trash, Loader } from 'lucide-react';
-import { useHistory, useLocation } from 'react-router-dom';
-import { NumericFormat } from 'react-number-format';
+import { Trash, Loader, ImageOff } from 'lucide-react';
 import moment from 'moment/moment';
 import { loadDataProduct } from '../../middleware/ProductAPI.jsx';
 import { USER_KEY } from '../../middleware/userKey.jsx';
@@ -66,7 +63,7 @@ function ListTableDisposal() {
     }
     useEffect(() => {
         fetchDataDisposal(1)
-    }, [])
+    }, [userToken])
 
     const columns = [
         {
@@ -179,6 +176,7 @@ function CardListProduct() {
                     value: x.pro_id,
                     label: x.pro_name,
                     barcode: x.pro_barcode,
+                    img: x.pro_img,
                     select: false
                 }))
                 // console.log(update);
@@ -193,7 +191,7 @@ function CardListProduct() {
         } else {
             fetchDataProduct()
         }
-    }, [checkResult.create])
+    }, [checkResult.create, userToken])
 
     const handleSelectProduct = (e, value) => {
         let update = listDataProduct.map((x) => {
@@ -258,7 +256,7 @@ function CardListProduct() {
     }
 
     return <>
-        <div className='grid grid-cols-3 gap-5 mb-14'>
+        <div className='grid grid-cols-3 gap-5  min-h-screen'>
             <div className='col-span-2'>
                 <div className={`${classes.contentnopad} mb-5 flex items-center justify-between`}>
                     <div className='flex p-3'>
@@ -279,10 +277,18 @@ function CardListProduct() {
                     {
                         listDataProduct.map((x, idx) => {
                             return <>
-                                <div key={idx} className={`${classes.carimg} cursor-pointer`} onClick={(e) => handleSelectProduct(e, x.value)}>
+                                <div key={idx} className={`${classes.carimg} cursor-pointer`}
+                                    onClick={(e) => handleSelectProduct(e, x.value)}>
                                     <div className='rounded-tl-lg'>
-                                        <div className='bg-slate-500 w-full h-[80px] rounded-tl-lg rounded-tr-lg'></div>
+                                        <div className='bg-white w-full h-[80px] rounded-tl-lg rounded-tr-lg'>
+                                            {
+                                                x.img === null || x.img === ''
+                                                    ? <div className='flex justify-center items-center h-full w-full'><ImageOff width={40} color='#777777' /></div>
+                                                    : <img src={x.img} alt='' className='w-full h-[80px] object-contain rounded-tl-lg rounded-tr-lg' />
+                                            }
+                                        </div>
                                     </div>
+                                    <hr />
                                     <p>{x?.label}</p>
                                 </div>
                             </>
@@ -290,7 +296,7 @@ function CardListProduct() {
                     }
                 </div>
             </div>
-            <div className={`${classes.contentnopad}`}>
+            <div className={`${classes.contentnopad} h-[48rem]`}>
                 <div className='flex justify-between text-xl font-bold'>
                     <h4 className=''>ລວມຈຳນວນ:</h4>
                     <span>{totalQty()}</span>

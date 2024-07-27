@@ -11,6 +11,11 @@ import PackingPreOrder from './CRUD/component/PackingPreOrder.jsx';
 import caricon from '../../assets/icon/cargo-truck.svg'
 import classescard from './CarPreOrderHome.module.css'
 import emptyicon from '../../assets/icon/empty.svg'
+import { USER_KEY } from '../../middleware/userKey.jsx';
+import Cookies from 'js-cookie'
+
+// const userToken = JSON.parse(localStorage.getItem(USER_KEY))
+const userToken = Cookies.get('koungStock')
 
 function CarPreOrderHome() {
     const { Search } = Input
@@ -33,7 +38,7 @@ function CarPreOrderHome() {
     const fetchData = async ({ status, page }) => {
         setLoading(true);
         try {
-            const { data, total } = await quertPreOrderByCar({ filter: status, page: page, limit: pageSize })
+            const { data, total } = await quertPreOrderByCar({ filter: status, page: page, limit: pageSize, token: userToken })
             setTimeout(() => {
                 setListData(data)
                 setTotalItems(total)
@@ -43,6 +48,7 @@ function CarPreOrderHome() {
             console.error(error)
         }
     };
+    // console.log(userToken);
 
     useEffect(() => {
         let _filter
@@ -52,7 +58,7 @@ function CarPreOrderHome() {
             _filter = selectDefult
         }
         fetchData({ status: _filter, page: current })
-    }, [selectDefult])
+    }, [selectDefult, userToken])
 
     const handleSelectFilter = (e) => setSelectDefult(e)
 

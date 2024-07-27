@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import classes from './Home.module.css'
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 import { Button, Layout, Menu } from 'antd';
@@ -14,12 +14,17 @@ import CarHome from '../car/CarHome.jsx';
 import CustomerHome from '../customer/CustomerHome.jsx';
 import PreOrderHome from '../preorder/PreOrderHome.jsx';
 import PreOrderForm from '../preorder/CRUD/PreOrderForm.jsx';
-import ReceiptPreOrder from '../preorder/CRUD/component/ReceiptPreOrder.jsx';
+import ReceiptPreOrder from '../preorder/CRUD/component/receiptOrder/ReceiptPreOrder.jsx';
 import CheckPreOrder from '../preorder/CRUD/CheckPreOrder.jsx';
 import { Truck, BarChartHorizontal, LayoutDashboard, Shapes, PackagePlus, Gem, Users, ClipboardX, CarFront } from 'lucide-react';
 import ImportDetailed from '../import/CRUD/ImportDetailed.jsx';
 import ReportHome from '../report/ReportHome.jsx';
 import DisposalHome from '../disposal/DisposalHome.jsx';
+import { USER_KEY } from '../../middleware/userKey.jsx';
+import BillSale from '../preorder/CRUD/sale/billsale/BillSale.jsx';
+
+
+const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 
 const { Header, Content, Sider } = Layout;
 
@@ -27,7 +32,7 @@ function HomePage() {
     const [collapsed, setCollapsed] = useState(false);
     const [dialogOpen, setDialogOpen] = useState({ logout: false });
 
-
+    // console.log(userToken);
 
     return (
         <>
@@ -119,7 +124,7 @@ function HomePage() {
                                     <Avatar
                                         className='bg-[#87d068] pt-[3px]'
                                     ><CircleUserRound /></Avatar>
-                                    <div className='pl-3 flex'><p>VTE4525</p><span className='px-1'>-</span><p>ອານຸລັກ ຈັນເພັງໄຊ</p></div>
+                                    <div className='pl-3 flex'>{userToken?.detail?.username}</div>
                                 </div>
                             </div>
 
@@ -140,6 +145,8 @@ function HomePage() {
                                     <Route exact path={`/home/preorder/create`} component={PreOrderForm} />
                                     <Route exact path={`/home/preorder/receipt`} component={ReceiptPreOrder} />
                                     <Route exact path={`/home/preorder/check`} component={CheckPreOrder} />
+
+                                    <Route exact path={`/home/salebill`} component={BillSale} />
 
                                     <Route exact path={`/home/product`} component={ProductHome} />
                                     <Route exact path={`/home/customer`} component={CustomerHome} />

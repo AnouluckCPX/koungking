@@ -6,9 +6,9 @@ import { myAPI } from '../../../middleware/api.jsx';
 import { USER_KEY } from '../../../middleware/userKey.jsx';
 import { X, ImagePlus } from 'lucide-react';
 import { alertSuccess } from '../../../components/notification/Notification.jsx'
+const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 
 function CarCreate({ use, cbuse, result, cbresult }) {
-    const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 
     const [modelCar, setModelCar] = useState({
         name: '',

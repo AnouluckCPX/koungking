@@ -7,6 +7,9 @@ import { SketchOutlined } from '@ant-design/icons';
 import { FilePen, Trash, Loader, Gem } from 'lucide-react';
 import CustomerCreate from './CRUD/CustomerCreate.jsx';
 import CustomerUpdate from './CRUD/CustomerUpdate.jsx';
+import { USER_KEY } from '../../middleware/userKey.jsx';
+
+const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 
 function CustomerHome() {
     const [openStatus, setOpenStatus] = useState({ create: false, update: false, delete: false });
@@ -27,7 +30,7 @@ function CustomerHome() {
         const fetchData = async () => {
             setLoading(true)
             try {
-                const { data } = await loadDataCustomer();
+                const { data } = await loadDataCustomer({ token: userToken });
                 setTimeout(() => {
                     // console.log(data?.data);
                     setListData(data?.data);
@@ -43,7 +46,7 @@ function CustomerHome() {
         } else {
             fetchData()
         }
-    }, [checkResult.create, checkResult.update, checkResult.delete])
+    }, [checkResult.create, checkResult.update, checkResult.delete, userToken])
 
     const columns = [
         {

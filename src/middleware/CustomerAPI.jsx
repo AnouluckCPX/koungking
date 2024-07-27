@@ -1,13 +1,10 @@
-import { MyToken } from "./LoginAPI.jsx"
 import { myAPI } from "./api.jsx"
 
-const userToken = JSON.parse(localStorage.getItem('@koungStock'))
-
-const loadDataCustomer = async () => {
+const loadDataCustomer = async ({ token }) => {
     try {
         const response = await myAPI.get('customer', {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token?.token}`
             },
         });
 

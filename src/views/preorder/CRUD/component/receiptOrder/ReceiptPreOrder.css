@@ -1,0 +1,63 @@
+.tableinvoice {
+    width: 100%;
+}
+
+.tableinvoice th {
+    border: 1px solid #ddd;
+    font-size: .625rem;
+    color: #1F2426;
+    font-weight: 600;
+    padding-top: .2rem;
+    padding-bottom: .2rem;
+    padding-left: .2rem;
+    padding-right: .2rem;
+    text-align: left;
+}
+
+.tableinvoice tr,
+td {
+    font-size: .625rem;
+    color: #1F2426;
+    padding: 0rem .2rem;
+}
+
+.tableinvoice th:nth-child(1) {
+    text-align: center !important;
+}
+
+.tableinvoice th:nth-child(3),
+.tableinvoice th:nth-child(4),
+.tableinvoice th:nth-child(5) {
+    text-align: center !important;
+}
+
+.tableinvoice .ctd {
+    border: 1px solid #ddd;
+}
+
+.tableinvoice tfoot td:nth-child(1) {
+    text-align: right !important;
+}
+
+@media print {
+    @page {
+        size: A5;
+        margin: 0;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .pagebreak {
+        clear: both;
+        page-break-after: always;
+    }
+
+    .billsale {
+        clear: both;
+        page-break-after: always;
+    }
+
+}

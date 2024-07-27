@@ -1,16 +1,12 @@
 
 import { myAPI } from "./api.jsx";
-import { MyToken } from "./LoginAPI.jsx";
 
-const userToken = JSON.parse(localStorage.getItem('@koungStock'))
-
-
-const loadDataCategory = async () => {
+export const loadDataCategory = async ({ token }) => {
 
     try {
         const response = await myAPI.get('category', {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token?.token}`
             },
         });
 
@@ -27,5 +23,3 @@ const loadDataCategory = async () => {
         throw error;  // Re-throw the error for the calling component to handle
     }
 }
-
-export { loadDataCategory };

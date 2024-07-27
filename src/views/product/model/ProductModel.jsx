@@ -8,6 +8,7 @@ class ProductModel {
         this.barcode = '';
         this.pro_type = '';
         this.price_sell = 0;
+        this.per_unit = 0;
     }
 }
 export default ProductModel;

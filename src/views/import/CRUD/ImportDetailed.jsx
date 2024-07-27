@@ -7,7 +7,9 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { NumericFormat } from 'react-number-format';
 import moment from 'moment/moment';
 import { postQueryImportById } from '../../../middleware/ImportAPI.jsx';
+import { USER_KEY } from '../../../middleware/userKey.jsx';
 
+const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 function ImportDetailed() {
     const location = useLocation()
     const history = useHistory()
@@ -20,12 +22,14 @@ function ImportDetailed() {
     const { im_id } = dataOld
 
     const [listData, setListData] = useState([])
+    const { total_discount, total_price, total_unit, im_tax, im_regis, im_note, im_deliver_by, im_date, im_company_name, im_bill_sell, im_bill, order_detail } = listData.length !== 0 ? listData[0] : {}
+
 
     useEffect(() => {
         const fetchData = async () => {
 
             try {
-                const { data } = await postQueryImportById(im_id)
+                const { data } = await postQueryImportById({ id: im_id, token: userToken })
                 setTimeout(() => {
                     setListData(data.data)
                 }, 200);
@@ -37,7 +41,6 @@ function ImportDetailed() {
 
     }, []);
 
-    const { total_discount, total_price, total_unit, im_tax, im_regis, im_note, im_deliver_by, im_date, im_company_name, im_bill_sell, im_bill, order_detail } = listData.length > 0 ? listData[0] : {}
 
     const columns = [
         {
@@ -48,7 +51,7 @@ function ImportDetailed() {
             render: (text) => <p className='text-xs'>{text}</p>,
         },
         {
-            title: `ສິນຄ້າ ${order_detail.length} ລາຍການ`,
+            title: `ສິນຄ້າ ${order_detail?.length} ລາຍການ`,
             dataIndex: 'pro_name',
             key: 'pro_name',
             render: (text) => (

@@ -6,7 +6,9 @@ import classesbtn from '../../components/style/ButtonStyle.module.css'
 import { useHistory } from 'react-router-dom';
 import moment from 'moment/moment';
 import { queryDataImport } from '../../middleware/ImportAPI';
-import { Loader, Truck, Copy, FileText, FileX } from 'lucide-react';
+import { USER_KEY } from '../../middleware/userKey.jsx';
+
+const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 
 function ImportHome() {
 
@@ -23,9 +25,9 @@ function ImportHome() {
     const [listData, setListData] = useState([])
     const [findDataUpdate, setFindDataUpdate] = useState([])
 
-    const fetchData = async (page) => {
+    const fetchData = async (page, pageSize) => {
         try {
-            const { data, total } = await queryDataImport(page, pageSize)
+            const { data, total } = await queryDataImport({ page: page, pageSize: pageSize, token: userToken });
             setListData(data)
             setTotalItems(total)
             setLoading(false)
@@ -34,8 +36,8 @@ function ImportHome() {
         }
     };
     useEffect(() => {
-        fetchData(1)
-    }, [])
+        fetchData(1, 10)
+    }, [userToken])
 
     const columns = [
         {
@@ -61,13 +63,13 @@ function ImportHome() {
             title: 'ຈຳນວນສິນຄ້າ',
             dataIndex: 'total_unit',
             key: 'total_unit',
-            render: (text) => <p>{text}</p>,
+            render: (text) => <p>{text?.toLocaleString('en-US')}</p>,
         },
         {
             title: 'ມູນຄ່າລວມ',
             dataIndex: 'im_total',
             key: 'im_total',
-            render: (text) => <p>{text}</p>,
+            render: (text) => <p>{text?.toLocaleString('en-US')}</p>,
         },
         {
             title: 'ຈັດການ',
@@ -75,18 +77,18 @@ function ImportHome() {
             render: (_, record) => (
                 <Space size='small' align="center">
                     <Button onClick={() => history.push({ pathname: '/home/import/view', state: { data: record } })}
-                        className='px-1 shadow-none border-none text-sm'>ເບິ່ງຂໍ້ມູນ</Button>
+                        className='px-1.5 shadow-none text-sm'>ເບິ່ງຂໍ້ມູນ</Button>
                     <Button onClick={() => {
                         // setFindDataUpdate(record)
                         // setOpenStatus({ delete: true })
                     }}
-                        className='px-1 shadow-none border-none text-sm'>ກ໋ອບປີ</Button>
+                        className='px-1.5 shadow-none text-sm'>ກ໋ອບປີ</Button>
                     <Button
                         onClick={() => {
                             setFindDataUpdate(record)
                             // setIsOpen({ packing: true })
                         }}
-                        className={`px-1 shadow-none border-none text-sm`}>
+                        className={`px-1.5 shadow-none text-sm`}>
                         ຍົກເລີກ
                     </Button>
                 </Space>
@@ -123,11 +125,11 @@ function ImportHome() {
                     columns={columns}
                     pagination={{
                         position: [top],
-                        pageSize: pageSize,
+                        // pageSize: pageSize,
                         total: totalItems,
                         showSizeChanger: true,
-                        onChange: (page) => {
-                            fetchData(page)
+                        onChange: (page, pageSize) => {
+                            fetchData(page, pageSize)
                         }
                     }}
                     dataSource={listData?.data}

@@ -11,6 +11,7 @@ function CategoryCreate({ use, cbuse, result, cbresult }) {
     const userToken = JSON.parse(localStorage.getItem(USER_KEY))
     const [modelCategory, setModelCategory] = useState({
         cate_name: '',
+        discount_vip: '',
         status: true,
     })
 
@@ -21,6 +22,7 @@ function CategoryCreate({ use, cbuse, result, cbresult }) {
     const hanldeCreateCategory = () => {
         let sendData = {
             cate_name: modelCategory.cate_name,
+            discount_vip: modelCategory.discount_vip,
             status: modelCategory.status,
         }
 
@@ -57,6 +59,14 @@ function CategoryCreate({ use, cbuse, result, cbresult }) {
                             <Input size='middle'
                                 value={modelCategory?.cate_name}
                                 onChange={(e) => setModelCategory({ ...modelCategory, cate_name: e.target.value })} />
+                        </div>
+                        <div>
+                            <p className="text-md mb-1.5 font-medium">
+                                ສ່ວນຫລຸດພິເສດ
+                            </p>
+                            <Input size='middle'
+                                value={modelCategory?.discount_vip}
+                                onChange={(e) => setModelCategory({ ...modelCategory, discount_vip: e.target.value })} />
                         </div>
                         <div>
                             <p className="text-md mb-1.5 font-medium">

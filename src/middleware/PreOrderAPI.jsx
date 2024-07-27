@@ -1,9 +1,6 @@
-import { MyToken } from "./LoginAPI.jsx";
 import { myAPI } from "./api.jsx";
 
-const userToken = JSON.parse(localStorage.getItem('@koungStock'))
-
-const loadDataPreOrder = async ({ filter, page, limit }) => {
+export const loadDataPreOrder = async ({ filter, page, limit, token }) => {
     try {
         const response = await myAPI.post('order', {
             status: filter,
@@ -11,7 +8,7 @@ const loadDataPreOrder = async ({ filter, page, limit }) => {
             limit: limit
         }, {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token}`
             },
         })
 
@@ -35,13 +32,13 @@ const loadDataPreOrder = async ({ filter, page, limit }) => {
     }
 }
 
-const loadDataPreOrderByID = async ({ id }) => {
+export const loadDataPreOrderByID = async ({ id, token }) => {
     try {
         const response = await myAPI.post('select_one_order', {
             o_id: id
         }, {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token?.token}`
             },
         });
 
@@ -57,24 +54,25 @@ const loadDataPreOrderByID = async ({ id }) => {
     }
 }
 
-const postCreatePreOrder = async ({ senddata }) => {
+export const postCreatePreOrder = async ({ senddata, token }) => {
     try {
         const response = await myAPI.post('create_order', senddata, {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token?.token}`
             },
         })
-        if (response.status === 200) return { data: response?.data }
+        if (response.status === 200) { return { data: response } }
+        else { return { data: response } }
     } catch (error) {
         throw new Error('Failed to post API request:', error);
     }
 }
 
-const postCheckOrderSuccess = async ({ senddata }) => {
+export const postCheckOrderSuccess = async ({ senddata, token }) => {
     try {
         const response = await myAPI.post('check_order', senddata, {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token?.token}`
             },
         })
         if (response.status === 200) return { data: response?.data }
@@ -83,11 +81,11 @@ const postCheckOrderSuccess = async ({ senddata }) => {
     }
 }
 
-const postPackingPreOrder = async ({ senddata }) => {
+export const postPackingPreOrder = async ({ senddata, token }) => {
     try {
         const response = await myAPI.post('car_order', senddata, {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token?.token}`
             },
         })
         console.log(response);
@@ -97,11 +95,11 @@ const postPackingPreOrder = async ({ senddata }) => {
     }
 }
 
-const postCloseOrder = async ({ senddata }) => {
+export const postCloseOrder = async ({ senddata, token }) => {
     try {
         const response = await myAPI.post('success_order', senddata, {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token?.token}`
             },
         })
         console.log(response);
@@ -111,11 +109,11 @@ const postCloseOrder = async ({ senddata }) => {
     }
 }
 
-const postCancelOrder = async ({ senddata }) => {
+export const postCancelOrder = async ({ senddata, token }) => {
     try {
         const response = await myAPI.post('order_cancel', senddata, {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token?.token}`
             },
         })
         console.log(response);
@@ -127,7 +125,7 @@ const postCancelOrder = async ({ senddata }) => {
     }
 }
 
-const quertPreOrderByCar = async ({ filter, page, limit }) => {
+export const quertPreOrderByCar = async ({ filter, page, limit, token }) => {
     try {
         const response = await myAPI.post('order_car', {
             status: filter,
@@ -135,7 +133,7 @@ const quertPreOrderByCar = async ({ filter, page, limit }) => {
             limit: limit
         }, {
             headers: {
-                'Authorization': `Bearer ${userToken?.token}`
+                'Authorization': `Bearer ${token?.token}`
             },
         })
 
@@ -157,10 +155,4 @@ const quertPreOrderByCar = async ({ filter, page, limit }) => {
     } catch (error) {
         throw new Error('Failed to post API request:', error);
     }
-}
-
-export {
-    loadDataPreOrder, loadDataPreOrderByID, postCheckOrderSuccess,
-    postCreatePreOrder, postPackingPreOrder, postCloseOrder, postCancelOrder,
-    quertPreOrderByCar
 }

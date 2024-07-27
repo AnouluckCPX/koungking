@@ -9,6 +9,9 @@ import CategoryCreate from './CRUD/CategoryCreate.jsx';
 import CategoryDelete from './CRUD/CategoryDelete.jsx';
 import CategoryUpdate from './CRUD/CategoryUpdate.jsx';
 
+import { USER_KEY } from '../../middleware/userKey.jsx';
+
+const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 
 function CategoryHome() {
     const [openStatus, setOpenStatus] = useState({ create: false, update: false, delete: false });
@@ -29,7 +32,7 @@ function CategoryHome() {
         const fetchData = async () => {
             setLoading(true)
             try {
-                const { data } = await loadDataCategory()
+                const { data } = await loadDataCategory({ token: userToken })
                 setTimeout(() => {
                     setListData(data?.data)
                     setLoading(false)
@@ -44,7 +47,7 @@ function CategoryHome() {
         } else {
             fetchData()
         }
-    }, [checkResult.create, checkResult.update, checkResult.delete])
+    }, [checkResult.create, checkResult.update, checkResult.delete, userToken])
 
     const columns = [
         {
@@ -60,6 +63,16 @@ function CategoryHome() {
             title: 'ຊື່ໝວດໝູ່',
             dataIndex: 'cate_name',
             key: 'cate_name',
+            render: (text) => (
+                <p>{text}</p>
+            ),
+            width: 200,
+        },
+        {
+            fixed: true,
+            title: 'ສ່ວນຫລຸດພິເສດ',
+            dataIndex: 'discount_vip',
+            key: 'discount_vip',
             render: (text) => (
                 <p>{text}</p>
             ),

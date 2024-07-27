@@ -12,8 +12,9 @@ import { VerticalAlignBottomOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 import '../../../components/style/CustomAntd.css'
 import { NumericFormat } from 'react-number-format';
-import CardSummaryPrice from './component/CardSummaryPrice.jsx';
 import ModalComplete from '../../../components/notification/ModalAlter.jsx';
+import { alertError } from '../../../components/notification/Notification.jsx';
+import CardSummaryPrice from './component/cardsummary/CardSummaryPrice.jsx';
 
 
 
@@ -32,7 +33,7 @@ function PreOrderForm() {
         const fetchDataCustomer = async () => {
             setLoading(true)
             try {
-                const { data } = await loadDataCustomer();
+                const { data } = await loadDataCustomer({ token: userToken });
                 let update = data?.data?.map((x) => ({
                     value: x.cus_id,
                     label: x.cus_name,
@@ -46,7 +47,7 @@ function PreOrderForm() {
         }
         fetchDataCustomer()
 
-    }, [])
+    }, [userToken])
 
 
     const handleSelectCustomer = (e) => {
@@ -97,19 +98,21 @@ function PreOrderList() {
     useEffect(() => {
         const fetchDataProduct = async () => {
             try {
-                const { data } = await loadDataProduct({ page: 1, limit: 200 });
+                const { data } = await loadDataProduct({ page: 1, limit: 200, token: userToken });
+                // console.log({ data });
                 let update = data?.map((x) => ({
                     value: x.pro_id,
                     label: x.pro_name,
                     barcode: x.pro_barcode,
-                    price: x.pro_price_sell,
+                    price_sell: x.pro_price_sell,
                     unit: x.pro_unit,
                     my_qty: 0,
                     total: 0,
                     discount: 0,
+                    pro_type: x.pro_type,
                     select: false
                 }))
-                // console.log(update);
+                // console.log({ update });
                 setListDataProduct(update)
 
             } catch (error) {
@@ -118,20 +121,22 @@ function PreOrderList() {
         }
 
         fetchDataProduct()
-    }, [])
+    }, [userToken])
 
-
+    // console.log(listDataProduct);
     const handleSelectProduct = (e) => {
         let update = listDataProduct.map((x) => {
             if (x.value === e) {
                 x.value = x.value
-                x.price = x.price
+                x.price_sell = x.price_sell
                 x.qty = x.qty
+                x.pro_type = x.pro_type
                 x.my_qty = 1
                 x.select = true
                 x.total = 0
                 x.discount = 0
             }
+            // console.log(x);
             return x
         })
         setListDataProduct(update)
@@ -165,7 +170,7 @@ function PreOrderList() {
 
     function totalAmountPrice() {
         let data = listDataProduct.filter((y) => y.select === true).map((x) => {
-            x.total = x.my_qty * x.price
+            x.total = x.my_qty * x.price_sell
             return x
         })
         let sum = data.reduce((total, currentValue) => total = total + currentValue.total, 0);
@@ -185,6 +190,7 @@ function PreOrderList() {
 
     const [valueTax, setValueTax] = useState(0)
     const [valueMoneyAll, setValueMoneyAll] = useState(0);
+    const [orderID, setOrderID] = useState('');
 
     const handleSavePreOrder = async () => {
 
@@ -192,7 +198,7 @@ function PreOrderList() {
             return {
                 pro_id: x.value,
                 pro_unit: x.my_qty,
-                pro_price: x.price,
+                pro_price: x.price_sell,
                 pro_discount: x.discount
             }
         })
@@ -205,14 +211,18 @@ function PreOrderList() {
             tax: valueTax,
             order_detail: detailedList
         }
+        // console.log(sendData);
 
         try {
-            const { data } = await postCreatePreOrder({ senddata: sendData })
-            // console.log(data)
+            const { data } = await postCreatePreOrder({ senddata: sendData, token: userToken })
+            // console.log(data?.data?.order_id)
             if (data?.status === 200) {
                 setTimeout(() => {
+                    setOrderID(data?.data?.order_id)
                     setIsOpen({ complete: true })
                 }, 200);
+            } else {
+                alertError('ມີບາງຢ່າງຜິດພາດ, ບໍ່ສາມາດບັນທຶກຂໍ້ມູນນີ້ໄດ້')
             }
         } catch (error) {
             throw new Error('Failed to post API request:', error);
@@ -301,7 +311,7 @@ function PreOrderList() {
                                             </td>
                                             <td className='td'>
                                                 <Input autoComplete={false} size='small' className='py-0.5 text-right'
-                                                    value={row.price} readOnly={true} />
+                                                    value={row.price_sell} readOnly={true} />
                                             </td>
                                             <td className='td'>
                                                 <div className='flex items-center'>
@@ -314,7 +324,7 @@ function PreOrderList() {
                                                     <Input
                                                         readOnly={true}
                                                         size='small' className='py-0.5 w-20 text-center'
-                                                        value={'ກະຕຸກ'} />
+                                                        value={row.pro_type === 'CAN' ? 'ກະປ໋ອງ' : row.pro_type === 'GLASS' ? 'ແກ້ວ' : row.pro_type === 'BOTH' ? 'ກະຕຸກ' : 'ອື່ນໆ'} />
                                                 </div>
                                             </td>
                                             <td className='td'>
@@ -326,7 +336,7 @@ function PreOrderList() {
                                             </td>
                                             <td className='td'>
                                                 <NumericFormat
-                                                    value={row.my_qty * row.price}
+                                                    value={row.my_qty * row.price_sell}
                                                     className='text-right'
                                                     readOnly={true}
                                                     autoComplete={false} size='middle'
@@ -353,15 +363,12 @@ function PreOrderList() {
         <ModalComplete
             header='ເບີກສິນຄ້າສຳເລັດ'
             label={`ທ່ານຕ້ອງການກວດສອບລາຍການຂໍ້ມູນ ຫລື ບໍ?`}
-            labelok='ພິມໃບບິນ'
-            labelcheck='ກວດສິນຄ້າ'
-            labelnew='ກັບຄືນ'
-            labelcancel='ສ້າງລາຍການໃໝ່'
             back={'back'}
             open={isOpen.complete}
             close={(x) => {
                 setIsOpen({ complete: x })
             }}
+            preorderID={orderID}
         />
     </>
 }

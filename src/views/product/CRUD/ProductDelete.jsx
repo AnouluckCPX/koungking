@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'antd'
-import { alertSuccess } from '../../../components/notification/Notification.jsx'
+import { alertError, alertSuccess } from '../../../components/notification/Notification.jsx'
 import { postDeleteProduct } from '../../../middleware/ProductAPI.jsx';
+import { USER_KEY } from '../../../middleware/userKey.jsx';
+
+const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 
 function ProductDelete({ dataValue, use, close, result, cbresult }) {
   const { pro_id } = dataValue
@@ -9,7 +12,7 @@ function ProductDelete({ dataValue, use, close, result, cbresult }) {
   const handleDeleteProduct = async () => {
     let sendData = { id: pro_id }
     try {
-      const { data } = await postDeleteProduct({ senddata: sendData })
+      const { data } = await postDeleteProduct({ senddata: sendData, token: userToken })
       // console.log(data)
       if (data?.status === 200) {
         setTimeout(() => {
@@ -17,6 +20,8 @@ function ProductDelete({ dataValue, use, close, result, cbresult }) {
           cbresult(!result)
           close(!use)
         }, 200);
+      } else {
+        alertError({ title: 'ບໍ່ສຳເລັດ', label: 'ມີຂໍ້ມູນບາງຢ່າງຜິດພາດ.' })
       }
     } catch (error) {
       throw new Error('Failed to post API request:', error);

@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Modal } from 'antd'
 import { alertError, alertSuccess } from '../../../../components/notification/Notification.jsx'
 import { postCancelOrder } from '../../../../middleware/PreOrderAPI.jsx';
+import { USER_KEY } from '../../../../middleware/userKey.jsx';
+
+const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 
 function CancelOrderDialog({ dataValue, use, close, result, cbresult }) {
     // console.log(dataValue);
@@ -23,7 +26,7 @@ function CancelOrderDialog({ dataValue, use, close, result, cbresult }) {
         }
         // console.log(sendData);
         try {
-            const { data } = await postCancelOrder({ senddata: sendData })
+            const { data } = await postCancelOrder({ senddata: sendData, token: userToken })
             // console.log(data)
             if (data?.status === 200) {
                 setTimeout(() => {

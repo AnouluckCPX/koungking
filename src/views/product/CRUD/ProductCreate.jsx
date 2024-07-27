@@ -10,10 +10,11 @@ import ProductModel from '../model/ProductModel.jsx';
 import { alertSuccess } from '../../../components/notification/Notification.jsx'
 import { loadDataCategory } from '../../../middleware/CategoryAPI.jsx';
 
+const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 
 function ProductCreate({ use, cbuse, result, cbresult }) {
     const [modelProduct, setModelProduct] = useState(new ProductModel())
-    const { name, price, barcode, unit, price_sell } = modelProduct
+    const { name, price, barcode, unit, price_sell, per_unit } = modelProduct
 
     const [listDataCategory, setListDataCategory] = useState([])
     const [loading, setLoading] = useState(false)
@@ -77,12 +78,13 @@ function ProductCreate({ use, cbuse, result, cbresult }) {
             cate_id: selectDefult,
             barcode: barcode,
             pro_type: selectProtype,
-            price_sell: price_sell
+            price_sell: price_sell,
+            per_unit: per_unit
         }
 
         try {
-            const { data } = await postCreateProduct({ senddata: sendData })
-            console.log(data)
+            const { data } = await postCreateProduct({ senddata: sendData, token: userToken })
+            // console.log(data)
             setTimeout(() => {
                 alertSuccess({ title: 'ສຳເລັດ', label: 'ບັນທຶກຂໍ້ມູນສິນຄ້າໃໝ່ເຂົ້າລະບົບສຳເລັດແລ້ວ.' })
                 setModelProduct({ price: 0, unit: 0, price_sell: 0 })
@@ -121,6 +123,15 @@ function ProductCreate({ use, cbuse, result, cbresult }) {
                         <Input autoComplete={false} size='middle'
                             value={name}
                             onChange={(e) => setModelProduct({ ...modelProduct, name: e.target.value })} />
+                    </div>
+                    <div>
+                        <p className="text-md mb-1.5 font-medium">
+                            ໜ່ວຍ
+                        </p>
+                        <InputNumber
+                            value={per_unit}
+                            min={1} defaultValue={0} autoComplete={false} size='middle' className='w-full'
+                            onChange={(e) => setModelProduct({ ...modelProduct, per_unit: e })} />
                     </div>
                     <div>
                         <p className="text-md mb-1.5 font-medium">
@@ -169,6 +180,7 @@ function ProductCreate({ use, cbuse, result, cbresult }) {
                             min={1} defaultValue={0} autoComplete={false} size='middle' className='w-full'
                             onChange={(e) => setModelProduct({ ...modelProduct, unit: e })} />
                     </div>
+
                     <div>
                         <p className="text-md mb-1.5 font-medium">
                             ຫົວໜ່ວຍ

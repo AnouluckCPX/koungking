@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Input, Select, Upload } from 'antd';
+import { Button, Input, InputNumber, Select, Upload } from 'antd';
 import classes from '../../../components/style/LayoutStyle.module.css'
 import classesbtn from '../../../components/style/ButtonStyle.module.css'
 import { myAPI } from '../../../middleware/api.jsx';
@@ -12,11 +12,12 @@ import ModalComplete from './ModalComplete.jsx';
 import { alertError, alertWarning } from '../../../components/notification/Notification.jsx';
 import { postCreateImport } from '../../../middleware/ImportAPI.jsx';
 import { postUploadImage } from '../../../middleware/UploadImageAPI.jsx';
-import { MyToken } from '../../../middleware/LoginAPI.jsx';
+import { USER_KEY } from '../../../middleware/userKey.jsx';
 
+const userToken = JSON.parse(localStorage.getItem(USER_KEY))
 
 function ImportCreate() {
-    const userToken = MyToken()
+
     const { TextArea } = Input
 
 
@@ -41,7 +42,7 @@ function ImportCreate() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const { data } = await loadDataProduct({ page: 1, limit: 200 })
+                const { data } = await loadDataProduct({ page: 1, limit: 200, token: userToken });
                 let update = data?.map((x) => ({
                     value: x.pro_id,
                     label: x.pro_name,
@@ -216,7 +217,7 @@ function ImportCreate() {
             }
 
             try {
-                const { data } = await postCreateImport({ senddata: sendData })
+                const { data } = await postCreateImport({ senddata: sendData, token: userToken })
                 if (data.status === 200) return setIsOpen({ complete: true })
                 if (data.status === 299) return alertError({ title: 'ເກີດຂໍ້ຂັດຂ້ອງ!', label: 'ບໍ່ສາມາດນຳສິນຄ້າເຂົ້າສາງ, ກະລຸນາກວດສອບອີກຄັ້ງ.' })
             } catch (error) {
@@ -382,12 +383,11 @@ function ImportCreate() {
                                         {
                                             dataProduct?.map((row, idx) => {
                                                 if (row.status === true) {
-                                                    // console.log(row)
-                                                    let i = 1
+                                                    let i = idx + 1
                                                     return (
                                                         <tr key={idx} class="bg-white border-b ">
                                                             <td class=" text-center ">
-                                                                {i + 1}
+                                                                {i}
                                                             </td>
                                                             <td class="text-xs">
                                                                 {row.barcode}
@@ -435,10 +435,11 @@ function ImportCreate() {
                                                                     onChange={(e) => handleInputDis(idx, e.target.value, row.value)} />
                                                             </td>
                                                             <td class="">
-                                                                <Input
+                                                                <InputNumber
+                                                                    stringMode
                                                                     value={row.tax}
                                                                     autoComplete={false} size='middle'
-                                                                    onChange={(e) => handleInputTax(idx, e.target.value, row.value)} />
+                                                                    onChange={(e) => handleInputTax(idx, e, row.value)} />
                                                             </td>
                                                             <td class="">
                                                                 <Input
